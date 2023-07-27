@@ -1,0 +1,57 @@
+There are few steps through which we can acheive how to add custom action button in the order listing table in prestashop 1.7
+Remember: this is only valid for order listing table. but for product listing/ category listing - procedure is the same. just filename will change. 
+
+Step 1: Open file ProjectName/src/Core/Grid/Definition/Factory/OrderGridDefinitionFactory.php
+Scroll to the bottom and add the following code
+
+ ->add((new LinkRowAction('download_xml'))
+  ->setName($this->trans('Download Xml', [], 'Admin.Actions'))
+  ->setIcon('download')
+  ->setOptions([
+    'route' => 'admin_orders_download_xml',
+    'route_param_name' => 'orderId',
+    'route_param_field' => 'id_order',
+    'use_inline_display' => true,
+    'clickable_row' => true,
+  ])
+)
+
+
+Route: You can add route as you desired but 'admin_orders' is prefix. So this must be enter.
+
+
+Step2:
+Now this route require url to define somewhere. So whenver this button will hit, 
+Require url will redirect.
+Open the file ProjectName/src/PrestaShopBundle/Resources/config/routing/admin/sell/orders/orders.yml
+
+Add below code near the 50, 52 line number.
+admin_orders_download_xml:
+  path: /{orderId}/download-xml
+  methods: [GET]
+  defaults:
+    _controller: PrestaShopBundle:Admin/Sell/Order/Order:downloadXml
+    _legacy_controller: AdminOrders
+  requirements:
+    orderId: \d+
+
+admin_orders_download_xml : main heading is the same route which is defined in step 1
+path :  will be dynamic or your choic
+_controller : its the controller name and function name. order:downloadXml (order represent controll, downloadXml is function name)
+
+
+Step3:
+Now we have set up the route, now function require to addd.
+function need to add in ordercontroller named with downloadXmlAction
+public function downloadXmlAction($orderId)
+    {
+      // anything you want
+    }
+
+Action is postfix which must be enter. 
+
+Step4:
+admin panel/advanced parameters/performance/ clear your cache.
+
+done.
+
